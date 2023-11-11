@@ -1,7 +1,3 @@
-'''
-Simple To-Do List Application: Create a basic to-do list application that allows users to add, delete, and update tasks using command-line input.
-'''
-
 import csv
 import os
 
@@ -12,7 +8,9 @@ def create_csv_file():
         with open(FILE_NAME, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['Task', 'Deadline'])
-print("Welcome to the to do list")
+
+print("Welcome to the to-do list")
+
 def save_tasks_to_csv():
     with open(FILE_NAME, mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -22,6 +20,7 @@ def save_tasks_to_csv():
                 writer.writerow([task['name'], task['deadline']])
             else:
                 writer.writerow([task, ""])
+
 def load_tasks_from_csv():
     create_csv_file()
     with open(FILE_NAME, mode='r') as file:
@@ -31,8 +30,8 @@ def load_tasks_from_csv():
             if row[1] != "":
                 tasks.append({'name': row[0], 'deadline': row[1]})
             else:
-                tasks.append(row[0])
-print("Welcome to the to-do list")
+                tasks.append({'name': row[0]})
+
 tasks = []
 load_tasks_from_csv()
 
@@ -41,13 +40,21 @@ def show_tasks():
         print("No tasks in the to-do list.")
     else:
         print("Tasks:")
-        sorted_tasks = sorted(tasks, key=lambda x: x.get('deadline', ''))
-        for i, task in enumerate(sorted_tasks, start=1):
-            print(f"{i}. {task['name']}", end="")
-            if 'deadline' in task:
-                print(f" - Deadline: {task['deadline']}")
-            else:
-                print()
+        tasks_with_deadline = [task for task in tasks if 'deadline' in task]
+        tasks_without_deadline = [task for task in tasks if 'deadline' not in task]
+
+        if tasks_with_deadline:
+            print("\nTasks with Deadline:")
+            for i, task in enumerate(sorted(tasks_with_deadline, key=lambda x: x['deadline']), start=1):
+                print(f"{i}. {task['name']} - Deadline: {task['deadline']}")
+
+        if tasks_without_deadline:
+            print("\nTasks without Deadline:")
+            for i, task in enumerate(tasks_without_deadline, start=len(tasks_with_deadline) + 1):
+                print(f"{i}. {task['name']}")
+
+show_tasks()
+
 
 def add_task(task):
     has_deadline = input("Does the task have a deadline? (yes/no): ").lower()
@@ -60,7 +67,7 @@ def add_task(task):
 
 def delete_task(task_index):
     if 1 <= task_index <= len(tasks):
-        deleted_task = tasks.pop(task_index - 1)
+        deleted_task = tasks.pop(task_index - 1)['name']
         print(f"Task '{deleted_task}' deleted.")
     else:
         print("Invalid task index.")
@@ -107,10 +114,3 @@ while True:
         break
     else:
         print("Invalid choice. Please try again.")
-
-
-
-
-
-
-
